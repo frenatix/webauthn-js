@@ -2,7 +2,7 @@ const url = require('url')
 const cbor = require('cbor')
 const jwkToPem = require('jwk-to-pem')
 const crypto = require('crypto')
-const { sha256, unparseUUID, coseToJwk } = require('./util')
+const { sha256, unparseUUID, coseToJwk } = require('./util/util')
 
 // Global map of registered attestation formats
 // https://www.w3.org/TR/webauthn/#defined-attestation-formats
