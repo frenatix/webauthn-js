@@ -173,20 +173,23 @@ const registerNewCredential = ({
   // the new credential with the account that was denoted in the options.user passed to create(), by associating it
   // with the credentialId and credentialPublicKey in the attestedCredentialData in authData, as appropriate for the
   // Relying Party's system.
-  try {
-    saveUserCredential({
-      id: authenticatorData.credentialId,
-      publicKeyJwk: authenticatorData.publicKeyJwk,
-      signCount: authenticatorData.signCount
-    })
-  } catch (e) {
-    throw e
+  const credential = {
+    id: authenticatorData.attestedCredentialData.credentialId.toString('base64'),
+    publicKeyJwk: authenticatorData.attestedCredentialData.publicKeyJwk,
+    signCount: authenticatorData.signCount
+  }
+  if (saveUserCredential) {
+    try {
+      saveUserCredential(credential)
+    } catch (e) {
+      throw e
+    }
   }
 
   // Step 19: If the attestation statement attStmt successfully verified but is not trustworthy per step 16 above,
   // the Relying Party SHOULD fail the registration ceremony.
 
-  return authenticatorData
+  return credential
 }
 
 const retrieveValue = (stringOrFunction) => {
