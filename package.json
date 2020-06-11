@@ -1,0 +1,27 @@
+{
+  "name": "webauthn-js",
+  "version": "1.0.0",
+  "description": "A webauthn server lib for node.js",
+  "main": "src/webauthn.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frenatix/webauthn-js.git"
+  },
+  "keywords": [
+    "webauthn",
+    "fido2"
+  ],
+  "author": "Jon Yip",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frenatix/webauthn-js/issues"
+  },
+  "homepage": "https://github.com/frenatix/webauthn-js",
+  "dependencies": {
+    "cbor": "^5.0.2",
+    "jwk-to-pem": "^2.0.3"
+  }
+}
