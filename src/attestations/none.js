@@ -2,7 +2,7 @@
 // https://www.w3.org/TR/webauthn/#none-attestation
 
 const attestation = {
-  name: 'packed',
+  name: 'none',
   verifyAttestation: () => {},
   verifyAssertion: () => {}
 }

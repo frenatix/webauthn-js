@@ -140,7 +140,7 @@ const registerNewCredential = ({
   // Step 13: Determine the attestation statement format by performing a USASCII case-sensitive match on fmt against
   // the set of supported WebAuthn Attestation Statement Format Identifier values.
   if (!Object.keys(attestationMap).includes(attestationObject.fmt)) {
-    throw new Error('Attestation statement format not supported')
+    throw new Error(`Attestation statement format not supported: ${attestationObject.fmt}`)
   }
 
   // Step 14: Verify that attStmt is a correct attestation statement, conveying a valid attestation signature, by
