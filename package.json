@@ -1,5 +1,5 @@
 {
-  "name": "webauthn-js",
+  "name": "@frenatix/webauthn-js",
   "version": "1.0.0",
   "description": "A webauthn server lib for node.js",
   "main": "src/webauthn.js",
