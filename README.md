@@ -68,3 +68,6 @@ verifyAssertion({
   }
 })
 ```
+
+## Demo Project
+You can find a demo project how to use this lib [here](https://github.com/frenatix/webauthn-js-demo).
