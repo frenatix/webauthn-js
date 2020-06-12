@@ -37,13 +37,13 @@ const authenticatorData = webauthn.registerNewCredential({
 
 #### Parameters
 
-| Name                  | Type                     | Description       |
-| --------------------- | ------------------------ | ----------------- |
-| `response`            | Object                   | The response of the authenticator (described [here](https://www.w3.org/TR/webauthn/#authenticatorresponse)). It consists of the properties `clientDataJSON` and `attestationObject` |
-| `isValidChallenge`    | function({challenge})    | Should returns `true` if challenge check was successful |
-| `expectedHostname`    | string \| function       | The hostname for this credential |
-| `isValidCredentialId` | function({credentialId}) | Check if the credential is already used |
-| `saveUserCredential`  | function                 | Callback function when credential creation was created |
+| Name                     | Type                     | Description       |
+| ------------------------ | ------------------------ | ----------------- |
+| `response`               | Object                   | The response of the authenticator (described [here](https://www.w3.org/TR/webauthn/#authenticatorresponse)). It consists of the properties `clientDataJSON` and `attestationObject` |
+| `getValidChallengeToken` | function(challenge)      | Should returns `true` if challenge check was successful |
+| `expectedHostname`       | string \| function       | The hostname for this credential |
+| `isValidCredentialId`    | function({credentialId}) | Check if the credential is already used |
+| `saveUserCredential`     | function                 | Callback function when credential creation was created |
 
 ### `verifyAssertion()`
 ```js

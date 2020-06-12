@@ -23,7 +23,7 @@ registerAttestation(require('./attestations/none'))
  */
 const registerNewCredential = async ({
   response,
-  isValidChallenge,
+  getValidChallengeToken,
   expectedHostname,
   isValidCredentialId,
   saveUserCredential,
@@ -35,11 +35,11 @@ const registerNewCredential = async ({
   if (!response.clientDataJSON) {
     throw new Error('Property "clientDataJSON" is missing')
   }
-  if (!isValidChallenge) {
+  if (!getValidChallengeToken) {
     throw new Error('Parameter "isValidChallenge" is missing')
   }
-  if (!(isValidChallenge instanceof Function)) {
-    throw new Error('Parameter "isValidChallenge" must be a function')
+  if (!(getValidChallengeToken instanceof Function)) {
+    throw new Error('Parameter "getValidChallengeToken" must be a function')
   }
   if (!expectedHostname) {
     throw new Error('Parameter "expectedHostname" is missing')
@@ -80,7 +80,8 @@ const registerNewCredential = async ({
     throw new Error('Property "clientDataJSON.challenge" is missing')
   }
 
-  if (!isValidChallenge({challenge: C.challenge})) {
+  const challengeToken = await getValidChallengeToken(C.challenge)
+  if (!challengeToken) {
     throw new Error('Invalid challenge')
   }
 
@@ -168,7 +169,7 @@ const registerNewCredential = async ({
   // Step 17: Check that the credentialId is not yet registered to any other user. If registration is requested
   // for a credential that is already registered to a different user, the Relying Party SHOULD fail this
   // registration ceremony, or it MAY decide to accept the registration, e.g. while deleting the older registration.
-  if (!isValidCredentialId({credentialId: authenticatorData.credentialId})) {
+  if (!isValidCredentialId(authenticatorData.credentialId)) {
     throw new Error('CredentialId is not allowed')
   }
 
@@ -179,11 +180,11 @@ const registerNewCredential = async ({
   const credential = {
     id: authenticatorData.attestedCredentialData.credentialId.toString('base64'),
     publicKeyJwk: authenticatorData.attestedCredentialData.publicKeyJwk,
-    signCount: authenticatorData.signCount
+    signCount: authenticatorData.signCount,
   }
 
   if (saveUserCredential) {
-    await saveUserCredential(credential)
+    await saveUserCredential({...credential, challengeToken})
   }
 
   // Step 19: If the attestation statement attStmt successfully verified but is not trustworthy per step 16 above,
@@ -297,7 +298,7 @@ const parseAuthenticatorData = (authData) => {
 const verifyAssertion = async ({
   response,
   credential,
-  isValidChallenge,
+  getValidChallengeToken,
   expectedHostname,
   isAllowedCredentialId,
   updateSignCount
@@ -315,8 +316,11 @@ const verifyAssertion = async ({
   if (!response.authenticatorData) {
     throw new Error('Property "authenticatorData" is missing')
   }
-  if (!isValidChallenge) {
-    throw new Error('Parameter "expectedChallenge" is missing')
+  if (!getValidChallengeToken) {
+    throw new Error('Parameter "isValidChallenge" is missing')
+  }
+  if (!(getValidChallengeToken instanceof Function)) {
+    throw new Error('Parameter "getValidChallengeToken" must be a function')
   }
   if (!expectedHostname) {
     throw new Error('Parameter "expectedHostname" is missing')
@@ -366,7 +370,8 @@ const verifyAssertion = async ({
 
   // Step 8: Verify that the value of C.challenge matches the challenge that was sent to the
   // authenticator in the PublicKeyCredentialRequestOptions passed to the get() call.
-  if (!await isValidChallenge({challenge: C.challenge})) {
+  const challengeToken = await getValidChallengeToken(C.challenge)
+  if (!challengeToken) {
     throw new Error('Invalid challenge')
   }
 
