@@ -23,7 +23,7 @@ registerAttestation(require('./attestations/none'))
  */
 const registerNewCredential = ({
   response,
-  expectedChallenge,
+  isValidChallenge,
   expectedHostname,
   isValidCredentialId,
   saveUserCredential,
@@ -35,8 +35,11 @@ const registerNewCredential = ({
   if (!response.clientDataJSON) {
     throw new Error('Property "clientDataJSON" is missing')
   }
-  if (!expectedChallenge) {
-    throw new Error('Parameter "expectedChallenge" is missing')
+  if (!isValidChallenge) {
+    throw new Error('Parameter "isValidChallenge" is missing')
+  }
+  if (!(isValidChallenge instanceof Function)) {
+    throw new Error('Parameter "isValidChallenge" must be a function')
   }
   if (!expectedHostname) {
     throw new Error('Parameter "expectedHostname" is missing')
@@ -76,9 +79,9 @@ const registerNewCredential = ({
   if (!C.challenge) {
     throw new Error('Property "clientDataJSON.challenge" is missing')
   }
-  const _expectedChallenge = retrieveValue(expectedChallenge)
-  if (C.challenge !== _expectedChallenge) {
-    throw new Error(`Invalid value in "cliengDataJSON.challenge". Expected challenge "${_expectedChallenge}"`)
+
+  if (!isValidChallenge({challenge: C.challenge})) {
+    throw new Error('Invalid challenge')
   }
 
   // Step 5: Verify that the value of C.origin matches the Relying Party's origin.
@@ -165,7 +168,7 @@ const registerNewCredential = ({
   // Step 17: Check that the credentialId is not yet registered to any other user. If registration is requested
   // for a credential that is already registered to a different user, the Relying Party SHOULD fail this
   // registration ceremony, or it MAY decide to accept the registration, e.g. while deleting the older registration.
-  if (!isValidCredentialId(authenticatorData.credentialId)) {
+  if (!isValidCredentialId({credentialId: authenticatorData.credentialId})) {
     throw new Error('CredentialId is not allowed')
   }
 
@@ -297,7 +300,7 @@ const parseAuthenticatorData = (authData) => {
 const verifyAssertion = ({
   response,
   credential,
-  expectedChallenge,
+  isValidChallenge,
   expectedHostname,
   isAllowedCredentialId,
   updateSignCount
@@ -315,7 +318,7 @@ const verifyAssertion = ({
   if (!response.authenticatorData) {
     throw new Error('Property "authenticatorData" is missing')
   }
-  if (!expectedChallenge) {
+  if (!isValidChallenge) {
     throw new Error('Parameter "expectedChallenge" is missing')
   }
   if (!expectedHostname) {
@@ -366,9 +369,8 @@ const verifyAssertion = ({
 
   // Step 8: Verify that the value of C.challenge matches the challenge that was sent to the
   // authenticator in the PublicKeyCredentialRequestOptions passed to the get() call.
-  const _expectedChallenge = retrieveValue(expectedChallenge)
-  if (C.challenge !== _expectedChallenge) {
-    throw new Error(`Invalid value in "cliengDataJSON.challenge". Expected challenge "${_expectedChallenge}"`)
+  if (!isValidChallenge({challenge: C.challenge})) {
+    throw new Error('Invalid challenge')
   }
 
   // Step 9: Verify that the value of C.origin matches the Relying Party's origin.
