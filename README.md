@@ -1,4 +1,7 @@
 # webauthn-js: A webauthn server lib for node.js
+<a href="https://www.npmjs.com/package/@frenatix/webauthn-js"><img src="https://img.shields.io/npm/v/@frenatix/webauthn-js.svg" alt="Version"></a>
+<a href="https://github.com/frenatix/webauthn-js/blob/master/LICENSE"><img src="https://img.shields.io/github/license/frenatix/webauthn-js.svg" alt="License"></a>
+
 
 ## Motivation
 When I was looking for a server implementation of [webauthn](https://www.w3.org/TR/webauthn/) in JS, I stumpled over an [webauthn example app](https://github.com/MicrosoftEdge/webauthnsample) made by the Microsoft Edge team. In contrast to other server implementations in JS it worked straight away with my FIDO2 authenticators. So I decided to extract the code and build a server lib.
