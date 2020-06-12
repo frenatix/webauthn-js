@@ -21,7 +21,7 @@ registerAttestation(require('./attestations/none'))
  *
  * https://www.w3.org/TR/webauthn/#registering-a-new-credential
  */
-const registerNewCredential = ({
+const registerNewCredential = async ({
   response,
   isValidChallenge,
   expectedHostname,
@@ -85,7 +85,7 @@ const registerNewCredential = ({
   }
 
   // Step 5: Verify that the value of C.origin matches the Relying Party's origin.
-  const _expectedHostname = retrieveValue(expectedHostname)
+  const _expectedHostname = await retrieveValue(expectedHostname)
   checkOrigin(C.origin, _expectedHostname)
 
   // Step 6: Verify that the value of C.tokenBinding.status matches the state of Token Binding for the TLS connection
@@ -181,12 +181,9 @@ const registerNewCredential = ({
     publicKeyJwk: authenticatorData.attestedCredentialData.publicKeyJwk,
     signCount: authenticatorData.signCount
   }
+
   if (saveUserCredential) {
-    try {
-      saveUserCredential(credential)
-    } catch (e) {
-      throw e
-    }
+    await saveUserCredential(credential)
   }
 
   // Step 19: If the attestation statement attStmt successfully verified but is not trustworthy per step 16 above,
@@ -195,10 +192,10 @@ const registerNewCredential = ({
   return credential
 }
 
-const retrieveValue = (stringOrFunction) => {
+const retrieveValue = async (stringOrFunction) => {
   let value
   if (stringOrFunction instanceof Function) {
-    value = stringOrFunction()
+    value = await stringOrFunction()
   } else {
     value = stringOrFunction
   }
@@ -297,7 +294,7 @@ const parseAuthenticatorData = (authData) => {
  *
  * https://www.w3.org/TR/webauthn/#verifying-assertion
  */
-const verifyAssertion = ({
+const verifyAssertion = async ({
   response,
   credential,
   isValidChallenge,
@@ -327,7 +324,7 @@ const verifyAssertion = ({
 
   // Step 1: If the allowCredentials option was given when this authentication ceremony was initiated,
   // verify that credential.id identifies one of the public key credentials that were listed in allowCredentials.
-  if (!isAllowedCredentialId(credential.id)) {
+  if (!await isAllowedCredentialId(credential.id)) {
     throw new Error('Credential ID is not allowed')
   }
 
@@ -369,12 +366,12 @@ const verifyAssertion = ({
 
   // Step 8: Verify that the value of C.challenge matches the challenge that was sent to the
   // authenticator in the PublicKeyCredentialRequestOptions passed to the get() call.
-  if (!isValidChallenge({challenge: C.challenge})) {
+  if (!await isValidChallenge({challenge: C.challenge})) {
     throw new Error('Invalid challenge')
   }
 
   // Step 9: Verify that the value of C.origin matches the Relying Party's origin.
-  const _expectedHostname = retrieveValue(expectedHostname)
+  const _expectedHostname = await retrieveValue(expectedHostname)
   checkOrigin(C.origin, _expectedHostname)
 
   // Step 10: Verify that the value of C.tokenBinding.status matches the state of Token Binding for
