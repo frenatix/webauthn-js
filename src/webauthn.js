@@ -441,7 +441,7 @@ const verifyAssertion = async ({
   if (updateSignCount) {
     if (updateSignCount instanceof Function) {
       updateSignCount({
-        credentialId: credential.id,
+        credentialId: response.id,
         oldSignCount: credential.signCount,
         newSignCount: authenticatorData.signCount
       })
