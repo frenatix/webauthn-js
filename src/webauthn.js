@@ -237,13 +237,6 @@ const parseAuthenticatorData = (authData) => {
   // Bit 7: Extension data included
   authenticatorData.flags = authData[32]
 
-  // If extension flag is set, then we abort.
-  // We can't determine the length of Attested Credential Data reliably.
-  // see https://stackoverflow.com/questions/54045911/webauthn-byte-length-of-the-credential-public-key
-  if (authenticatorData.flags & 0b10000000) {
-    throw new Error('Extension Data is included. Not supported by this lib.')
-  }
-
   // signCount (4 bytes): Signature counter, 32-bit unsigned big-endian integer.
   authenticatorData.signCount = new DataView(new Uint8Array(authData.slice(33, 37)).buffer).getInt32(0, false)
 
@@ -276,7 +269,22 @@ const parseAuthenticatorData = (authData) => {
     authenticatorData.attestedCredentialData = attestedCredentialData
   }
 
-  // No extensions handling
+  // If extension flag is set
+  // Bit 7 is set
+  if (authenticatorData.flags & 0b10000000) {
+    let extensionDataCbor
+    if (authenticatorData.attestedCredentialData) {
+      // We have to read the whole section again
+      // see https://stackoverflow.com/questions/54045911/webauthn-byte-length-of-the-credential-public-key
+      extensionDataCbor = cbor.decodeAllSync(
+        authData.slice(55 + authenticatorData.attestedCredentialData.credentialIdLength, authData.length)
+      )
+      extensionDataCbor = extensionDataCbor[1]
+    } else {
+      extensionDataCbor = cbor.decodeFirstSync(authData.slice(37, authData.length))
+    }
+    authenticatorData.extensionData = cbor.encode(extensionDataCbor).toString('base64')
+  }
 
   return authenticatorData
 }
