@@ -46,6 +46,7 @@ const authenticatorData = await webauthn.registerNewCredential({
 | ------------------------ | ------------------------ | ----------------- |
 | `response`               | Object                   | The response of the authenticator (described [here](https://www.w3.org/TR/webauthn/#authenticatorresponse)). It consists of the properties `clientDataJSON` and `attestationObject` |
 | `getValidChallengeToken` | function(challenge)      | Should returns `true` if challenge check was successful |
+| `userVerification`       | string                   | `required | preferred | discouraged`, default. `preferred` |
 | `expectedHostname`       | string \| function       | The hostname for this credential |
 | `isValidCredentialId`    | function(credentialId)   | Check if the credential is already used |
 | `saveUserCredential`     | function({id, publicKeyJwk, signCount, challengeToken}) | Callback function when credential creation was created |
@@ -88,6 +89,7 @@ verifyAssertion({
 | ------------------------ | ------------------------ | ----------------- |
 | `assertion`              | Object                   | The response of the authenticator (described [here](https://www.w3.org/TR/webauthn/#authenticatorassertionresponse)) |
 | `getValidChallengeToken` | function(challenge)      | Should returns `true` if challenge check was successful |
+| `userVerification`       | string                   | `required | preferred | discouraged`, default. `preferred` |
 | `expectedHostname`       | string \| function       | The hostname for this credential |
 | `isAllowedCredentialId`  | function(credentialId)   | Check if the credential is already allowed |
 | `updateSignCount`        | function({credentialId, oldSignCount, newSignCount}) | Callback function to update the sign count |

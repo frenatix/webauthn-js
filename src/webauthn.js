@@ -24,6 +24,7 @@ registerAttestation(require('./attestations/none'))
 const registerNewCredential = async ({
   response,
   getValidChallengeToken,
+  userVerification = 'preferred',
   expectedHostname,
   isValidCredentialId,
   saveUserCredential,
@@ -55,6 +56,9 @@ const registerNewCredential = async ({
   }
   if (!(saveUserCredential instanceof Function)) {
     throw new Error('Parameter "saveUserCredential" must be a function')
+  }
+  if (!['required', 'preferred', 'discouraged'].includes(userVerification)) {
+    throw new Error('Parameter "userVerification" is invalid')
   }
 
   // Step 1: Let JSONtext be the result of running UTF-8 decode on the value of response.clientDataJSON.
@@ -133,7 +137,7 @@ const registerNewCredential = async ({
 
   // Step 11: If user verification is required for this registration, verify that the User
   // Verified bit of the flags in authData is set.
-  if ((authenticatorData.flags & 0b00000100) == 0) {
+  if (userVerification === 'required' && (authenticatorData.flags & 0b00000100) == 0) {
     throw new Error('User Verified bit was not set in "attestationObject.authData.flags"')
   }
 
@@ -299,6 +303,7 @@ const verifyAssertion = async ({
   response,
   credential,
   getValidChallengeToken,
+  userVerification = 'preferred',
   expectedHostname,
   isAllowedCredentialId,
   updateSignCount
@@ -324,6 +329,9 @@ const verifyAssertion = async ({
   }
   if (!expectedHostname) {
     throw new Error('Parameter "expectedHostname" is missing')
+  }
+  if (!['required', 'preferred', 'discouraged'].includes(userVerification)) {
+    throw new Error('Parameter "userVerification" is invalid')
   }
 
   // Step 1: If the allowCredentials option was given when this authentication ceremony was initiated,
@@ -405,7 +413,7 @@ const verifyAssertion = async ({
 
   // Step 13: If user verification is required for this assertion, verify that the User Verified bit
   // of the flags in authData is set.
-  if ((authenticatorData.flags & 0b00000100) == 0) {
+  if (userVerification === 'required' && (authenticatorData.flags & 0b00000100) == 0) {
     throw new Error('User Verified bit was not set in "authData.flags"')
   }
 
